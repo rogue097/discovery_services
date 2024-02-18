@@ -14,4 +14,7 @@ public class AwsConfig {
 
   @Value("${aws.secret.key}")
   private String secretKey;
+
+  @Value("${aws.region}")
+  private String region;
 }

@@ -1,13 +1,12 @@
 package com.rogue.services.config;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
 
 @RequiredArgsConstructor
 @Configuration
@@ -15,12 +14,14 @@ public class S3Config {
   private final AwsConfig awsConfig;
 
   @Bean
-  public AmazonS3 amazonS3() {
-    BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsConfig.getAccessKey(), awsConfig.getSecretKey());
+  public S3Client s3Client() {
+    AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(
+            awsConfig.getAccessKey(),
+            awsConfig.getSecretKey());
 
-    return AmazonS3ClientBuilder.standard()
-            .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-            .withRegion(Regions.AP_SOUTH_1)
+    return S3Client.builder()
+            .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
+            .region(Region.of(awsConfig.getRegion()))
             .build();
   }
 }
